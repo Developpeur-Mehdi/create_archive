@@ -1,12 +1,13 @@
 import os
 import sys
 import pytest
+from unittest.mock import patch
+import zipfile
 
 # Assurez-vous d'ajouter le bon chemin vers le dossier src
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
 from backup import get_home_directory, get_backup_filename, create_backup
-
 
 def test_get_home_directory():
     """Vérifie que la fonction retourne bien le chemin du home."""
@@ -24,8 +25,20 @@ def test_create_backup():
     home_dir = get_home_directory()
     backup_name = get_backup_filename()
     
-    # Appel de la fonction avec les bons arguments
-    filename = create_backup(home_dir, backup_name)
-    
-    assert os.path.isfile(filename)  # Vérifie que le fichier existe
-    os.remove(filename)  # Nettoyage après test
+    # Mock de l'appel à zipfile.ZipFile pour éviter la création réelle de l'archive
+    with patch('zipfile.ZipFile') as mock_zipfile:
+        # Nous faisons simplement une simulation de la méthode .write
+        mock_zipfile.return_value.__enter__.return_value.write = lambda *args, **kwargs: None
+        
+        # Appel de la fonction avec les bons arguments
+        filename = create_backup(home_dir, backup_name)
+
+        # Vérifie que le fichier retourne le bon chemin
+        assert filename == os.path.join(os.path.dirname(__file__), '..', 'backup_zip', backup_name)
+        
+        # Vérifie que zipfile.ZipFile a bien été appelé
+        mock_zipfile.assert_called_once_with(
+            os.path.join(os.path.dirname(__file__), '..', 'backup_zip', backup_name.replace(".zip", "")) + '.zip',
+            'w',
+            zipfile.ZIP_DEFLATED
+        )
