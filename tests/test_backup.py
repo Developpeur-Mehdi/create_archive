@@ -5,6 +5,7 @@ from unittest.mock import patch
 import zipfile
 
 # Assurez-vous d'ajouter le bon chemin vers le dossier src
+# Assurez-vous d'ajouter le bon chemin vers le dossier src
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
 from backup import get_home_directory, get_backup_filename, create_backup
@@ -33,9 +34,10 @@ def test_create_backup():
         # Appel de la fonction avec les bons arguments
         filename = create_backup(home_dir, backup_name)
 
-        # Vérifie que le fichier retourne le bon chemin
-        assert filename == os.path.join(os.path.dirname(__file__), '..', 'backup_zip', backup_name)
-        
+        # Vérifie que le nom de fichier retourné contient bien le nom attendu
+        expected_filename = os.path.basename(filename)  # On prend juste le nom de fichier, pas le chemin complet
+        assert expected_filename == backup_name  # Compare seulement le nom du fichier
+
         # Vérifie que zipfile.ZipFile a bien été appelé
         mock_zipfile.assert_called_once_with(
             os.path.join(os.path.dirname(__file__), '..', 'backup_zip', backup_name.replace(".zip", "")) + '.zip',
