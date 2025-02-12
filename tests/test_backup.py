@@ -1,6 +1,12 @@
-import os
+import os, sys
 import pytest
-from src.backup import get_home_directory, get_backup_filename, create_backup
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
+
+from backup import get_home_directory, get_backup_filename, create_backup
+
+
+# from src.backup import get_home_directory, get_backup_filename, create_backup
 
 def test_get_home_directory():
     """Vérifie que la fonction retourne bien le chemin du home."""
