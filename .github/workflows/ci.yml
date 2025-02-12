@@ -29,7 +29,7 @@ jobs:
         run: echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV  # Ajout du chemin src au PYTHONPATH
 
       - name: Run tests
-        run: pytest --junitxml=report.xml
+        run: pytest --junitxml=report.xml  # Exécute les tests et génère un rapport au format XML
 
       - name: Send email notification
         uses: dawidd6/action-send-mail@v3
@@ -40,6 +40,6 @@ jobs:
           password: ${{secrets.EMAIL_PASS}}
           subject: "Résultat des tests GitHub Actions"
           body: "Les tests ont été exécutés. Voir les résultats ci-joints."
-          to: mehdipailot@hotmail.fr
+          to: mehdipailot@hotmail.fr  # Adresse de réception des notifications
           from: "GitHub Actions <noreply@github.com>"
-          attachments: report.xml
+          attachments: report.xml  # Joindre le rapport des tests au mail
