@@ -40,6 +40,6 @@ jobs:
           password: ${{secrets.EMAIL_PASS}}
           subject: "Résultat des tests GitHub Actions"
           body: "Les tests ont été exécutés. Voir les résultats ci-joints."
-          to: mehdipailot@hotmail.fr  # Adresse de réception des notifications
+          to: ${{secrets.RECEIVER_EMAIL}}  # Adresse de réception des notifications
           from: "GitHub Actions <noreply@github.com>"
           attachments: report.xml  # Joindre le rapport des tests au mail

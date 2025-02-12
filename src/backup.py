@@ -1,5 +1,5 @@
 import os
-import shutil
+import zipfile
 import platform
 from datetime import datetime
 
@@ -13,7 +13,9 @@ def get_backup_filename():
     return f"backup_{timestamp}.zip"
 
 def create_backup(home_dir, backup_name):
-    """Crée une archive ZIP du répertoire personnel dans le dossier 'backup_zip' à la racine du projet."""
+    """Crée une archive ZIP du répertoire personnel dans le dossier 'backup_zip' à la racine du projet, 
+       en excluant les répertoires 'node_modules' et 'venv'."""
+    
     # Aller dans le dossier racine du projet, peu importe où le script est exécuté
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     backup_dir = os.path.join(project_root, 'backup_zip')  # Dossier 'backup_zip' à la racine du projet
@@ -29,13 +31,30 @@ def create_backup(home_dir, backup_name):
 
     # Créer l'archive dans le dossier 'backup_zip'
     backup_path = os.path.join(backup_dir, backup_name.replace(".zip", ""))
+    
+    # Création de l'archive ZIP manuellement pour exclure les répertoires spécifiques
     try:
-        shutil.make_archive(backup_path, 'zip', home_dir)
+        with zipfile.ZipFile(backup_path + '.zip', 'w', zipfile.ZIP_DEFLATED) as backup_zip:
+            for dirpath, dirnames, filenames in os.walk(home_dir):
+                # Exclure les répertoires 'node_modules' et 'venv'
+                if 'node_modules' in dirnames:
+                    dirnames.remove('node_modules')
+                if 'venv' in dirnames:
+                    dirnames.remove('venv')
+                
+                # Ajouter les fichiers au ZIP
+                for filename in filenames:
+                    file_path = os.path.join(dirpath, filename)
+                    arcname = os.path.relpath(file_path, home_dir)  # Conserver la structure relative
+                    backup_zip.write(file_path, arcname=arcname)
+        
         print(f"Archive créée : {backup_path}.zip")
+    
     except Exception as e:
         print(f"Erreur lors de la création de l'archive : {e}")
         return None
 
+    return os.path.join(backup_dir, backup_name)
     return os.path.join(backup_dir, backup_name)
 
 def create_backup_based_on_os():
